@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import stateDetails from '../state';
 import cornerstone from 'cornerstone-core';
+import cornerstoneTools from 'cornerstone-tools';
 
 class AISection extends Component {
   state = {
@@ -105,12 +106,20 @@ class AISection extends Component {
     fetch(endpoint, requestOptions)
       .then(response => response.json())
       .then(responseJson => {
-        stateDetails.predictionResults = responseJson.data;
+        stateDetails.predictionResults = responseJson.data.attributes;
+        if (responseJson.data.sections) {
+          stateDetails.sectionResults = responseJson.data.sections;
+        }
         document
           .getElementsByClassName('tab-list-item results-section')[0]
           .click();
 
-        UINotificationService.hide({pendingNotificationId})
+        stateDetails.sectionResults.map(function(sectionItem) {
+          if (sectionItem.start && sectionItem.end) {
+            this.drawRect(sectionItem.start, sectionItem.end);
+          }
+        }, this);
+        UINotificationService.hide({ pendingNotificationId });
         UINotificationService.show({
           title: 'Success',
           message: 'Successfully gained prediction results!!!',
@@ -123,6 +132,53 @@ class AISection extends Component {
         return console.log(error);
       });
   };
+
+  drawRect(start_data, end_data) {
+    const activeEnabledElement = cornerstone.getEnabledElements()[0];
+
+    if (!activeEnabledElement) {
+      return;
+    }
+
+    const canvas = activeEnabledElement.canvas;
+    const context = canvas.getContext('2d');
+    const element = activeEnabledElement.element;
+    console.log(activeEnabledElement);
+
+    var start = { x: start_data.x, y: start_data.y };
+    var end = { x: end_data.x, y: end_data.y };
+
+    const measurementData = {
+      visible: true,
+      active: true,
+      invalidated: true,
+      handles: {
+        start: {
+          x: start.x,
+          y: start.y,
+          highlight: true,
+          active: true,
+        },
+        end: {
+          x: end.x,
+          y: end.y,
+          highlight: true,
+          active: true,
+        },
+        textBox: {
+          active: false,
+          hasMoved: false,
+          movesIndependently: false,
+          drawnIndependently: true,
+          allowedOutsideImage: true,
+          hasBoundingBox: true,
+        },
+      },
+    };
+
+    cornerstoneTools.clearToolState(element, 'RectangleRoi');
+    cornerstoneTools.addToolState(element, 'RectangleRoi', measurementData);
+  }
 
   componentDidMount() {
     const input = document.getElementById('model-selection');
