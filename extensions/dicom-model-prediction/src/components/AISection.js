@@ -91,6 +91,8 @@ class AISection extends Component {
 
     formData.append('image', imageBlob);
     formData.append('modelId', modelId);
+    formData.append('rows', activeEnabledElement.image.rows);
+    formData.append('columns', activeEnabledElement.image.columns);
 
     const requestOptions = {
       method: 'POST',
@@ -143,7 +145,6 @@ class AISection extends Component {
     const canvas = activeEnabledElement.canvas;
     const context = canvas.getContext('2d');
     const element = activeEnabledElement.element;
-    console.log(activeEnabledElement);
 
     var start = { x: start_data.x, y: start_data.y };
     var end = { x: end_data.x, y: end_data.y };
@@ -157,7 +158,7 @@ class AISection extends Component {
           x: start.x,
           y: start.y,
           highlight: true,
-          active: true,
+          active: false,
         },
         end: {
           x: end.x,
@@ -176,7 +177,9 @@ class AISection extends Component {
       },
     };
 
-    cornerstoneTools.clearToolState(element, 'RectangleRoi');
+    // cornerstoneTools.clearToolState(element, 'RectangleRoi');
+    // const toolData = cornerstoneTools.getToolState(element, 'rectangleRoi');
+    // console.log(toolData)
     cornerstoneTools.addToolState(element, 'RectangleRoi', measurementData);
   }
 
