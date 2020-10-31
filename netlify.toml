@@ -25,8 +25,8 @@
 
 # Production context: all deploys from the Production branch set in your site's
 # deploy contexts will inherit these settings.
-[context.production]
-  ignore = "exit 0" # Never build production; We'll let our CI do that
+# [context.production]
+#  ignore = "exit 0" # Never build production; We'll let our CI do that
 
 [[headers]]
   # Define which paths this specific [[headers]] block will cover.
